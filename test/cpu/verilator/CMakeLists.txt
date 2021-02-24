@@ -17,3 +17,5 @@ set(TB_FLIST
     ${DARKCIRCUIT_SOURCE_DIR}/rtl/blocks/JtagCoreDbg/rtl/SimDpiJtag.sv
 )
 include(${DARKCIRCUIT_SOURCE_DIR}/tools/eda/verilator/simple_test.cmake)
+
+configure_file(run_tests.sh.in run_tests.sh @ONLY)

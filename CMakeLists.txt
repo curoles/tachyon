@@ -32,6 +32,8 @@ endif()
 find_program(TACHY_GCC tachy-gcc REQUIRED)
 get_filename_component(TACHY_TC_DIR ${TACHY_GCC} DIRECTORY)
 set(TACHY_OBJCOPY ${TACHY_TC_DIR}/tachy-objcopy)
+set(TACHY_RUN ${TACHY_TC_DIR}/tachy-run)
+set(TACHY_QEMU ${TACHY_TC_DIR}/qemu-system-tachy)
 
 enable_testing()
 

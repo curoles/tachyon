@@ -1,0 +1,27 @@
+#!/bin/bash
+
+FSIM=@TACHY_RUN@
+QEMU=@TACHY_QEMU@
+RTLSIM=@CMAKE_CURRENT_BINARY_DIR@/obj_dir_TachyonCPU/VTbTop
+INSN_CTESTS=@CMAKE_CURRENT_BINARY_DIR@/../../../prg/test/insn/c/insn_ctests.txt
+
+red=`tput setaf 1; tput bold`
+green=`tput setaf 2`
+cyan=`tput setaf 6`
+reset=`tput sgr0`
+
+start_time=$(date +%s)
+
+while IFS= read -r test
+do
+  cmd="$FSIM $test.out"
+  time=$(( $(date +%s) - $start_time ))
+  echo "${cyan}${time} RUN${reset} $cmd"
+  $cmd || { echo "${red}FAIL${reset} $cmd"; exit 1; }
+
+  cmd="$RTLSIM $test.hex"
+  time=$(( $(date +%s) - $start_time ))
+  echo "${cyan}${time} RUN${reset} $cmd"
+  $cmd || { echo "${red}FAIL${reset} $cmd"; exit 1; }
+
+done < "$INSN_CTESTS"

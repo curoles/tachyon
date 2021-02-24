@@ -13,7 +13,7 @@ module TbTop (
     wire tck, tms, tdi, tdo, trstn;
 
     // JTAG signals driven by external OpenOCD process via Remote Bitbanging
-    SimDpiJtag#(.TCK_PERIOD(10), .ALWAYS_ENABLE(1), .TCP_PORT(9999))
+    SimDpiJtag#(.TCK_PERIOD(10), .ALWAYS_ENABLE(0), .TCP_PORT(9999))
         jtag_(
             .clk,
             .rst,
