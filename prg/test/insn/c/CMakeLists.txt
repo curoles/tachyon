@@ -16,7 +16,7 @@ foreach(testname ${INSN_CTESTS})
     foreach(oflag ${INSN_CTESTS_OFLAGS})
         add_custom_command(OUTPUT ${tname}_${oflag}.out ${tname}_${oflag}.hex
             COMMAND ${COMPILE_INSN_CTEST} -${oflag} ${CMAKE_CURRENT_SOURCE_DIR}/${testname}.c -o ${tname}_${oflag}.out
-            COMMAND ${TACHY_OBJCOPY} -O verilog ${tname}_${oflag}.out ${tname}_${oflag}.hex
+            COMMAND ${TACHY_OBJCOPY} -O verilog --verilog-data-width=1 ${tname}_${oflag}.out ${tname}_${oflag}.hex
             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../bare.S ${CMAKE_CURRENT_SOURCE_DIR}/../bare.ld
         )
         file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/insn_ctests.txt "${CMAKE_CURRENT_BINARY_DIR}/${tname}_${oflag}\n")

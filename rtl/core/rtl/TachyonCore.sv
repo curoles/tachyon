@@ -7,8 +7,7 @@
 module TachyonCore #(
     parameter   ADDR_WIDTH = 32,
     localparam  INSN_SIZE  = 4, // Instruction word size is 32 bits
-    localparam  DATA_SIZE  = INSN_SIZE, // insn and data bus is 4 bytes
-    localparam  DATA_WIDTH = DATA_SIZE * 8,
+    localparam  INSN_WIDTH = INSN_SIZE * 8,
     parameter   DBG_APB_ADDR_WIDTH  = 5,
     parameter   DBG_APB_WDATA_WIDTH = 32,
     parameter   DBG_APB_RDATA_WIDTH = 32
@@ -27,7 +26,8 @@ module TachyonCore #(
     output reg  [DBG_APB_RDATA_WIDTH-1:0] dbg_apb_rdata,
 
     output reg                   insn_fetch_en,
-    output reg  [ADDR_WIDTH-1:2] insn_fetch_addr
+    output reg  [ADDR_WIDTH-1:2] insn_fetch_addr,
+    input  wire [INSN_WIDTH-1:0] insn_fetch_data
 );
     wire                           dbg_req;   // Debug request
     wire                           dbg_wr_rd; // Debug register write/read request
@@ -85,8 +85,9 @@ module TachyonCore #(
             .clk(clk),
             .rst(rst),
             .rst_addr(rst_addr),
-            .fetch_addr(insn_fetch_addr)
-            //FIXME (insn_fetch_en)
+            .fetch_en(insn_fetch_en),
+            .fetch_addr(insn_fetch_addr),
+            .fetch_insn(insn_fetch_data)
     );
 
 endmodule: TachyonCore

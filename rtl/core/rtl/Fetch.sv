@@ -7,14 +7,17 @@
 module Fetch #(
     parameter   ADDR_WIDTH = 32,
     localparam  INSN_SIZE  = 4,
-    localparam  ADDR_START = 2 // 4 bytes aligned
+    localparam  ADDR_START = 2, // 4 bytes aligned
+    localparam  INSN_WIDTH = INSN_SIZE * 8
 )(
     input  wire                           clk,
     input  wire                           rst,
     input  wire [ADDR_WIDTH-1:ADDR_START] rst_addr,
     input  wire                           backend_redirect_en,
     input  wire [ADDR_WIDTH-1:ADDR_START] backend_redirect_addr,
-    output reg  [ADDR_WIDTH-1:ADDR_START] fetch_addr
+    output reg                            fetch_en,
+    output reg  [ADDR_WIDTH-1:ADDR_START] fetch_addr,
+    input  wire [INSN_WIDTH-1:0]          fetch_insn
 );
 
     ProgCounter#(.ADDR_WIDTH(ADDR_WIDTH))
@@ -24,5 +27,15 @@ module Fetch #(
             .rst_addr(rst_addr),
             .pc_addr(fetch_addr)
     );
+
+    always @(posedge clk)
+    begin
+        if (!rst) begin
+            fetch_en <= 1;
+            $display("FETCH: addr=%h op=%h", {fetch_addr, 2'b00}, fetch_insn);
+        end else begin
+            fetch_en <= 0;
+        end
+    end
 
 endmodule: Fetch

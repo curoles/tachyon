@@ -8,7 +8,9 @@ module TachyonCPU #(
     parameter   ADDR_WIDTH = 32,
     parameter   MEM_SIZE   = 2**ADDR_WIDTH,
     localparam  RAM_DATA_SIZE  = 4,
-    localparam  RAM_DATA_WIDTH = RAM_DATA_SIZE * 8
+    localparam  RAM_DATA_WIDTH = RAM_DATA_SIZE * 8,
+    localparam  INSN_SIZE = 4,
+    localparam  INSN_WIDTH = INSN_SIZE * 8
 )(
     input wire clk,
     input wire rst,
@@ -79,10 +81,10 @@ module TachyonCPU #(
     );
 
     wire                      ram_rd_en;
-    wire [ADDR_WIDTH-1:0]     ram_rd_addr;
+    wire [ADDR_WIDTH-1:2]     ram_rd_addr;
     wire [RAM_DATA_WIDTH-1:0] ram_rd_data;
     wire                      ram_wr_en;
-    wire [ADDR_WIDTH-1:0]     ram_wr_addr;
+    wire [ADDR_WIDTH-1:2]     ram_wr_addr;
     wire [RAM_DATA_WIDTH-1:0] ram_wr_data;
 
     SimRAM#(.DATA_SIZE(RAM_DATA_SIZE), .ADDR_WIDTH(ADDR_WIDTH))
@@ -92,10 +94,12 @@ module TachyonCPU #(
     );
 
     wire core2mem_fetch_en;
-    wire [ADDR_WIDTH-1:0] core2mem_fetch_addr;
+    wire [ADDR_WIDTH-1:2] core2mem_fetch_addr;
+    wire [INSN_WIDTH-1:0] mem2core_fetch_data;
 
     assign ram_rd_en = core2mem_fetch_en;
     assign ram_rd_addr = core2mem_fetch_addr;
+    assign mem2core_fetch_data = ram_rd_data;
 
     TachyonCore#(.ADDR_WIDTH(ADDR_WIDTH))
         _core(
@@ -110,13 +114,19 @@ module TachyonCPU #(
             .dbg_apb_ready(core2dbg_apb_slave_ready),
             .dbg_apb_rdata(core2dbg_apb_data_out[0]),
             .insn_fetch_en(core2mem_fetch_en),
-            .insn_fetch_addr(core2mem_fetch_addr)
+            .insn_fetch_addr(core2mem_fetch_addr),
+            .insn_fetch_data(mem2core_fetch_data)
     );
 
     export "DPI-C" function public_get_PC;
     function int unsigned public_get_PC();
         public_get_PC = core2mem_fetch_addr;
     endfunction
+
+    /*always @(posedge clk)
+    begin
+        $display("RRRRRRRRRRRRR en=%b addr=%h data=%h", ram_rd_en, {ram_rd_addr,2'b00}, ram_rd_data);
+    end*/
 
 endmodule: TachyonCPU
 
