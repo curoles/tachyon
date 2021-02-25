@@ -14,14 +14,14 @@ start_time=$(date +%s)
 
 while IFS= read -r test
 do
-  cmd="$FSIM $test.out"
-  time=$(( $(date +%s) - $start_time ))
-  echo "${cyan}${time} RUN${reset} $cmd"
-  $cmd || { echo "${red}FAIL${reset} $cmd"; exit 1; }
+    cmd="$FSIM $test.out"
+    time=$(( $(date +%s) - $start_time ))
+    echo "${cyan}${time} RUN${reset} $cmd"
+    $cmd || { echo "${red}FAIL${reset} $cmd"; exit 1; }
 
-  cmd="$RTLSIM $test.hex"
-  time=$(( $(date +%s) - $start_time ))
-  echo "${cyan}${time} RUN${reset} $cmd"
-  $cmd || { echo "${red}FAIL${reset} $cmd"; exit 1; }
+    cmd="$RTLSIM +prg-image-file-hex=$test.hex +reset-addr=0x11000"
+    time=$(( $(date +%s) - $start_time ))
+    echo "${cyan}${time} RUN${reset} $cmd"
+    $cmd || { echo "${red}FAIL${reset} $cmd"; exit 1; }
 
 done < "$INSN_CTESTS"

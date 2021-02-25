@@ -24,6 +24,7 @@ static uint32_t getPC(const VTbTop& top)
 int main(int argc, char* argv[])
 {
     printf("\n\nTest Tachyon CPU\n");
+    //for (int i = 0; i < argc; ++i) printf("ARG[%d]=%s\n", i, argv[i]);
 
     Verilated::commandArgs(argc, argv);
 
@@ -33,8 +34,9 @@ int main(int argc, char* argv[])
     Tick tick(top);
 
     top.rst = 1;
-    top.rst_addr = 16;
-    for (unsigned int i = 0; i < 5; ++i) {tick();}
+    top.ctb_rst_addr = 0x1000;
+    constexpr unsigned int NR_RESET_CYCLES = 5;
+    for (unsigned int i = 0; i < NR_RESET_CYCLES; ++i) {tick();}
     top.rst = 0;
 
     /*for (unsigned int i = 0; i < 10; ++i) {

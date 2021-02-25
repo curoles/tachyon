@@ -5,7 +5,7 @@
  *
  */
 module TachyonCore #(
-    parameter   ADDR_WIDTH,
+    parameter   ADDR_WIDTH = 32,
     localparam  INSN_SIZE  = 4, // Instruction word size is 32 bits
     localparam  DATA_SIZE  = INSN_SIZE, // insn and data bus is 4 bytes
     localparam  DATA_WIDTH = DATA_SIZE * 8,
@@ -80,23 +80,14 @@ module TachyonCore #(
         end
     end
 
-    PrgCounter#(.ADDR_WIDTH(ADDR_WIDTH), .INSN_SIZE(INSN_SIZE))
-        _pc(
+    Fetch#(.ADDR_WIDTH(ADDR_WIDTH))
+        _fetch(
             .clk(clk),
             .rst(rst),
             .rst_addr(rst_addr),
-            .pc_addr(insn_fetch_addr)
+            .fetch_addr(insn_fetch_addr)
+            //FIXME (insn_fetch_en)
     );
-
-    //always @ (posedge clk)
-    //begin
-    //    if (rst) begin
-    //        insn_fetch_addr <= rst_addr;
-    //        insn_fetch_en <= 0;
-    //    else begin
-    //        //
-    //    end
-    //end
 
 endmodule: TachyonCore
 
