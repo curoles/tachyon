@@ -11,7 +11,7 @@ project(TACHYON)
 # of the project as ${TACHYON_BINARY_DIR}.
 
 
-option(USE_VERILATOR "Use Verilator to compile"                     ON) # cmake -D USE_VERILATOR=OFF|ON path_src
+option(USE_VERILATOR "Use Verilator to compile" ON) # cmake -D USE_VERILATOR=OFF|ON path_src
 option(USE_XCELIUM   "Use Cadence Xcelium to compile and simulate" OFF)
 set(DARKCIRCUIT_SOURCE_DIR "${TACHYON_SOURCE_DIR}/../../dark-circuit/dark-circuit" CACHE PATH "Path to dark-circuit repo")
 
@@ -39,6 +39,7 @@ enable_testing()
 
 #add_subdirectory(docs)
 add_subdirectory(prg)
+add_subdirectory(tools)
 add_subdirectory(test)
 
 # Log CMake variables.
