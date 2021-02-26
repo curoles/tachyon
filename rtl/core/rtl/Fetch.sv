@@ -17,7 +17,11 @@ module Fetch #(
     input  wire [ADDR_WIDTH-1:ADDR_START] backend_redirect_addr,
     output reg                            fetch_en,
     output reg  [ADDR_WIDTH-1:ADDR_START] fetch_addr,
-    input  wire [INSN_WIDTH-1:0]          fetch_insn
+    input  wire [INSN_WIDTH-1:0]          fetch_insn,
+    // To next stage
+    output reg                            stage_out_insn_valid,
+    output reg  [ADDR_WIDTH-1:ADDR_START] stage_out_insn_addr,
+    output reg  [INSN_WIDTH-1:0]          stage_out_insn
 );
 
     ProgCounter#(.ADDR_WIDTH(ADDR_WIDTH))
@@ -32,10 +36,14 @@ module Fetch #(
     begin
         if (!rst) begin
             fetch_en <= 1;
-            $display("FETCH: addr=%h op=%h", {fetch_addr, 2'b00}, fetch_insn);
+            $display("%4t FETCH: addr=%h op=%h", $time, {fetch_addr, 2'b00}, fetch_insn);
         end else begin
             fetch_en <= 0;
         end
+
+        stage_out_insn_valid <= 1; //FIXME
+        stage_out_insn_addr <= fetch_addr;//FIXME
+        stage_out_insn <= fetch_insn;
     end
 
 endmodule: Fetch

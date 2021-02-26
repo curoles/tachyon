@@ -80,6 +80,10 @@ module TachyonCore #(
         end
     end
 
+    wire                  fetch2decode_insn_valid;
+    wire [ADDR_WIDTH-1:2] fetch2decode_insn_addr;
+    wire [INSN_WIDTH-1:0] fetch2decode_insn;
+
     Fetch#(.ADDR_WIDTH(ADDR_WIDTH))
         _fetch(
             .clk(clk),
@@ -87,7 +91,55 @@ module TachyonCore #(
             .rst_addr(rst_addr),
             .fetch_en(insn_fetch_en),
             .fetch_addr(insn_fetch_addr),
-            .fetch_insn(insn_fetch_data)
+            .fetch_insn(insn_fetch_data),
+            .stage_out_insn_valid(fetch2decode_insn_valid),
+            .stage_out_insn_addr(fetch2decode_insn_addr),
+            .stage_out_insn(fetch2decode_insn)
+    );
+
+    Decode#(.ADDR_WIDTH(ADDR_WIDTH))
+        _decode(
+            .clk(clk),
+            .rst(rst),
+            .insn_valid(fetch2decode_insn_valid),
+            .insn_addr(fetch2decode_insn_addr),
+            .insn(fetch2decode_insn)
+    );
+
+    ReadStage#(.ADDR_WIDTH(ADDR_WIDTH))
+        _read(
+            .clk(clk),
+            .rst(rst),
+            .insn_valid(fetch2decode_insn_valid),
+            .insn_addr(fetch2decode_insn_addr),
+            .insn(fetch2decode_insn)
+    );
+
+    ReadMemStage#(.ADDR_WIDTH(ADDR_WIDTH))
+        _readmem(
+            .clk(clk),
+            .rst(rst),
+            .insn_valid(fetch2decode_insn_valid),
+            .insn_addr(fetch2decode_insn_addr),
+            .insn(fetch2decode_insn)
+    );
+
+    Execute#(.ADDR_WIDTH(ADDR_WIDTH))
+        _execute(
+            .clk(clk),
+            .rst(rst),
+            .insn_valid(fetch2decode_insn_valid),
+            .insn_addr(fetch2decode_insn_addr),
+            .insn(fetch2decode_insn)
+    );
+
+    Writeback#(.ADDR_WIDTH(ADDR_WIDTH))
+        _writeback(
+            .clk(clk),
+            .rst(rst),
+            .insn_valid(fetch2decode_insn_valid),
+            .insn_addr(fetch2decode_insn_addr),
+            .insn(fetch2decode_insn)
     );
 
 endmodule: TachyonCore

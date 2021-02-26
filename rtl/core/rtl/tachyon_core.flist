@@ -1,3 +1,9 @@
+InsnDecodePkg.sv
+Writeback.sv
+Execute.sv
+ReadMemStage.sv
+ReadStage.sv
+Decode.sv
 ProgCounter.sv
 Fetch.sv
 TachyonCore.sv
