@@ -5,7 +5,7 @@
  * External Clang-TB drives the inputs and checks the outputs.
  */
 module TbTop #(
-    localparam ADDR_WIDTH = 18,
+    localparam ADDR_WIDTH = `PHYS_ADDR_WIDTH,
     localparam PRG_IMAGE_ARG = "prg-image-file-hex"
 )(
     input wire clk,

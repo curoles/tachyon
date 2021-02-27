@@ -97,49 +97,53 @@ module TachyonCore #(
             .stage_out_insn(fetch2decode_insn)
     );
 
+    stage::InsnBundle decode2read_insn;
+
     Decode#(.ADDR_WIDTH(ADDR_WIDTH))
         _decode(
             .clk(clk),
             .rst(rst),
             .insn_valid(fetch2decode_insn_valid),
             .insn_addr(fetch2decode_insn_addr),
-            .insn(fetch2decode_insn)
+            .insn(fetch2decode_insn),
+            .stage_out_insn(decode2read_insn)
     );
+
+    stage::InsnBundle read2mem_insn;
 
     ReadStage#(.ADDR_WIDTH(ADDR_WIDTH))
         _read(
             .clk(clk),
             .rst(rst),
-            .insn_valid(fetch2decode_insn_valid),
-            .insn_addr(fetch2decode_insn_addr),
-            .insn(fetch2decode_insn)
+            .insn(decode2read_insn),
+            .stage_out_insn(read2mem_insn)
     );
+
+    stage::InsnBundle mem2exe_insn;
 
     ReadMemStage#(.ADDR_WIDTH(ADDR_WIDTH))
         _readmem(
             .clk(clk),
             .rst(rst),
-            .insn_valid(fetch2decode_insn_valid),
-            .insn_addr(fetch2decode_insn_addr),
-            .insn(fetch2decode_insn)
+            .insn(read2mem_insn),
+            .stage_out_insn(mem2exe_insn)
     );
+
+    stage::InsnBundle exe2wrb_insn;
 
     Execute#(.ADDR_WIDTH(ADDR_WIDTH))
         _execute(
             .clk(clk),
             .rst(rst),
-            .insn_valid(fetch2decode_insn_valid),
-            .insn_addr(fetch2decode_insn_addr),
-            .insn(fetch2decode_insn)
+            .insn(mem2exe_insn),
+            .stage_out_insn(exe2wrb_insn)
     );
 
     Writeback#(.ADDR_WIDTH(ADDR_WIDTH))
         _writeback(
             .clk(clk),
             .rst(rst),
-            .insn_valid(fetch2decode_insn_valid),
-            .insn_addr(fetch2decode_insn_addr),
-            .insn(fetch2decode_insn)
+            .insn(exe2wrb_insn)
     );
 
 endmodule: TachyonCore

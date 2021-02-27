@@ -1,5 +1,3 @@
-import InsnDecodePkg::*;
-
 /* Decode pipeline stage.
  *
  * Author:    Igor Lesik 2021
@@ -16,7 +14,8 @@ module Decode #(
     input  wire                           rst,
     input  wire                           insn_valid,
     input  wire [ADDR_WIDTH-1:ADDR_START] insn_addr,
-    input  wire [INSN_WIDTH-1:0]          insn
+    input  wire [INSN_WIDTH-1:0]          insn,
+    output stage::InsnBundle              stage_out_insn
 );
 
     reg insn_is_branch;
@@ -31,6 +30,9 @@ module Decode #(
             //
         end
 
+        stage_out_insn.valid <= insn_valid; //FIXME
+        stage_out_insn.addr <= insn_addr;
+        stage_out_insn.insn <= insn;
     end
 
 endmodule

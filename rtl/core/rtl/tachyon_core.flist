@@ -1,4 +1,5 @@
 InsnDecodePkg.sv
+StagePkg.sv
 Writeback.sv
 Execute.sv
 ReadMemStage.sv

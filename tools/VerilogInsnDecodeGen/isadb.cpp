@@ -65,6 +65,9 @@ bool isa::Db::process_insn_file_line(const isa::Db::VectorStr& tokens)
     insn.id = nr_insns_;
     insn.name = tokens[1];
     insn.grpname = tokens[0];
+    insn.ximm = tokens[2];
+    insn.unit = tokens[4];
+    insn.signature = tokens[5];
 
     //fprintf(stdout, "Insn name:%s\n", insn.name.c_str());
 

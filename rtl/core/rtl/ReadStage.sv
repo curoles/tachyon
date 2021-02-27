@@ -1,5 +1,3 @@
-import InsnDecodePkg::*;
-
 /* Read pipeline stage.
  *
  * Author:    Igor Lesik 2021
@@ -14,23 +12,23 @@ module ReadStage #(
 )(
     input  wire                           clk,
     input  wire                           rst,
-    input  wire                           insn_valid,
-    input  wire [ADDR_WIDTH-1:ADDR_START] insn_addr,
-    input  wire [INSN_WIDTH-1:0]          insn
+    input  stage::InsnBundle              insn,
+    output stage::InsnBundle              stage_out_insn
 );
 
-    /*reg insn_is_branch;
-    assign insn_is_branch = InsnDecodePkg::insn_is_branch(insn);
+    //reg insn_is_branch;
+    //assign insn_is_branch = InsnDecodePkg::insn_is_branch(insn);
 
     always @(posedge clk)
     begin
         if (!rst) begin
-            $display("%4t DECODE: addr=%h op=%h is_branch=%d",
-                $time, {insn_addr, 2'b00}, insn, insn_is_branch);
+            $display("%4t READ: addr=%h op=%h",
+                $time, {insn.addr, 2'b00}, insn.insn);
         end else begin
             //
         end
 
-    end*/
+         stage_out_insn <= insn;
+    end
 
 endmodule

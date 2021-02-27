@@ -15,6 +15,7 @@ set(TB_FLIST
     -F ${TACHYON_SOURCE_DIR}/rtl/cpu/rtl/tachyon_cpu.flist
     -y ${DARKCIRCUIT_SOURCE_DIR}/rtl/lib/macros
     ${DARKCIRCUIT_SOURCE_DIR}/rtl/blocks/JtagCoreDbg/rtl/SimDpiJtag.sv
+    -DPHYS_ADDR_WIDTH=18
 )
 include(${DARKCIRCUIT_SOURCE_DIR}/tools/eda/verilator/simple_test.cmake)
 
