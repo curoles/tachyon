@@ -1,3 +1,5 @@
+`include "logmsg.svh"
+
 /* Writeback pipeline stage.
  *
  * Author:    Igor Lesik 2021
@@ -5,10 +7,10 @@
  *
  */
 module Writeback #(
-    parameter   ADDR_WIDTH = 32,
-    localparam  ADDR_START = 2, // 4 bytes aligned
-    localparam  INSN_SIZE  = 4,
-    localparam  INSN_WIDTH = INSN_SIZE * 8
+    parameter   ADDR_WIDTH = stage::ADDR_WIDTH,
+    localparam  ADDR_START = stage::ADDR_START,
+    localparam  INSN_SIZE  = stage::INSN_SIZE,
+    localparam  INSN_WIDTH = stage::INSN_WIDTH
 )(
     input  wire                           clk,
     input  wire                           rst,
@@ -18,8 +20,8 @@ module Writeback #(
     always @(posedge clk)
     begin
         if (!rst) begin
-            $display("%4t WRB: addr=%h op=%h",
-                $time, {insn.addr, 2'b00}, insn.insn);
+            `MSG(5, ("WRB: addr=%h op=%h",
+                {insn.addr, 2'b00}, insn.insn));
         end else begin
             //
         end

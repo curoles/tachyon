@@ -1,3 +1,5 @@
+`include "logmsg.svh"
+
 /* Read pipeline stage.
  *
  * Author:    Igor Lesik 2021
@@ -22,8 +24,8 @@ module ReadStage #(
     always @(posedge clk)
     begin
         if (!rst) begin
-            $display("%4t READ: addr=%h op=%h",
-                $time, {insn.addr, 2'b00}, insn.insn);
+            `MSG(5, ("READ: addr=%h op=%h",
+                {insn.addr, 2'b00}, insn.insn));
         end else begin
             //
         end

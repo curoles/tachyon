@@ -1,3 +1,5 @@
+`include "logmsg.svh"
+
 /* Tachyon CPU TB top module.
  *
  * Copyright Igor Lesik 2021.
@@ -42,6 +44,7 @@ module TbTop #(
     );
 
     int max_nr_cycles = 1000;
+    int run_forever = 0;
 
     // Do all startup steps: load program image and etc.
     initial begin
@@ -51,27 +54,34 @@ module TbTop #(
             string filename;
             if ($value$plusargs("prg-image-file-hex=%s", filename)) begin
                 int load_ok;
-                $display("Loading prg-image-file-hex=%s ...", filename);
+                `MSG(3, ("Loading prg-image-file-hex=%s ...", filename));
                 // Load image from file to memory array with `$readmemh(filename, _cpu._ram.ram);`
                 load_ok = _cpu._ram.load(filename, /*HEX=*/0);
-                $display("File %s loading status=%d", filename, load_ok);
+                `MSG(3, ("File %s loading status=%d", filename, load_ok));
             end
         end
 
         // Set reset fetch address.
         rst_addr = ctb_rst_addr;
         $value$plusargs("reset-addr=%h", rst_addr);
-        $display("Reset address=0x%h", rst_addr);
+        `MSG(3, ("Reset address=0x%h", rst_addr));
 
         // Max number of cycles to be allowed.
         if (!$value$plusargs("max-cycles=%d", max_nr_cycles)) begin
             max_nr_cycles = 1000;
         end
+
+        // Run forever, do not check max number of cycles.
+        if ($test$plusargs("run-forever")) begin
+            run_forever = 1;
+        end else begin
+            run_forever = 0;
+        end
     end
 
     int nr_cycles = 0;
     always @(posedge clk) begin
-        if (nr_cycles > max_nr_cycles)
+        if (!run_forever && nr_cycles > max_nr_cycles)
             $fatal("Error: MAX number of cycles exceeded");
         nr_cycles += 1;
     end

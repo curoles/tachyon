@@ -1,3 +1,5 @@
+`include "logmsg.svh"
+
 /* Tachyon Core Fetch pipeline stage.
  *
  * Author:    Igor Lesik 2021
@@ -36,7 +38,7 @@ module Fetch #(
     begin
         if (!rst) begin
             fetch_en <= 1;
-            $display("%4t FETCH: addr=%h op=%h", $time, {fetch_addr, 2'b00}, fetch_insn);
+            `MSG(5, ("FETCH: addr=%h op=%h", {fetch_addr, 2'b00}, fetch_insn));
         end else begin
             fetch_en <= 0;
         end

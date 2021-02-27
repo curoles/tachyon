@@ -1,3 +1,5 @@
+`include "logmsg.svh"
+
 /* Decode pipeline stage.
  *
  * Author:    Igor Lesik 2021
@@ -24,8 +26,8 @@ module Decode #(
     always @(posedge clk)
     begin
         if (!rst) begin
-            $display("%4t DECODE: addr=%h op=%h is_branch=%d",
-                $time, {insn_addr, 2'b00}, insn, insn_is_branch);
+            `MSG(5, ("DECODE: addr=%h op=%h is_branch=%d",
+                {insn_addr, 2'b00}, insn, insn_is_branch));
         end else begin
             //
         end

@@ -1,3 +1,5 @@
+`include "logmsg.svh"
+
 /* ReadMem pipeline stage.
  *
  * Author:    Igor Lesik 2021
@@ -19,8 +21,8 @@ module ReadMemStage #(
     always @(posedge clk)
     begin
         if (!rst) begin
-            $display("%4t RDMEM: addr=%h op=%h",
-                $time, {insn.addr, 2'b00}, insn.insn);
+            `MSG(5, ("RDMEM: addr=%h op=%h",
+                {insn.addr, 2'b00}, insn.insn));
         end else begin
             //
         end

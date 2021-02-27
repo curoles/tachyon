@@ -1,3 +1,5 @@
+`include "logmsg.svh"
+
 /* Execute pipeline stage.
  *
  * Author:    Igor Lesik 2021
@@ -19,8 +21,8 @@ module Execute #(
     always @(posedge clk)
     begin
         if (!rst) begin
-            $display("%4t EXE: addr=%h op=%h",
-                $time, {insn.addr, 2'b00}, insn.insn);
+            `MSG(5, ("EXE: addr=%h op=%h",
+                {insn.addr, 2'b00}, insn.insn));
         end else begin
             //
         end

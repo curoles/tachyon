@@ -1,0 +1,20 @@
+#!/bin/bash
+
+RTLSIM=@CMAKE_CURRENT_BINARY_DIR@/obj_dir_TachyonCPU/VTbTop
+
+red=`tput setaf 1; tput bold`
+green=`tput setaf 2`
+cyan=`tput setaf 6`
+reset=`tput sgr0`
+
+cmd="$RTLSIM +run-forever +debug-on-reset"
+echo "${cyan}Simulation: ${green}$cmd${reset}"
+echo "${red}Press Ctrl-C to terminate the simulation.${reset}"
+echo ""
+
+echo "Start OpenOCD in separate terminal and press any key when it is ready."
+echo ""
+
+read -t 120 -n 1 -p "Press any key"
+
+$cmd
