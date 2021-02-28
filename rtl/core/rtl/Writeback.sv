@@ -17,16 +17,21 @@ module Writeback #(
     input  stage::InsnBundle              insn
 );
 
+
     always @(posedge clk)
     begin
         if (!rst) begin
-            `MSG(5, ("WRB: addr=%h op=%h",
-                {insn.addr, 2'b00}, insn.insn));
+            //retire.valid <= 0;
         end else begin
-            //
+            //retire.valid <= insn.valid;
+            if (insn.valid) begin
+                `MSG(5, ("WRB: addr=%h op=%h",
+                    {insn.addr, 2'b00}, insn.insn));
+            end
         end
 
+        //retire.addr <= insn.addr;
+        //retire.insn <= insn.insn;
     end
-
 
 endmodule

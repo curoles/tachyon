@@ -15,6 +15,7 @@ module Fetch #(
     input  wire                           clk,
     input  wire                           rst,
     input  wire [ADDR_WIDTH-1:ADDR_START] rst_addr,
+    input  wire                           dbg_on_rst,
     input  wire                           backend_redirect_en,
     input  wire [ADDR_WIDTH-1:ADDR_START] backend_redirect_addr,
     output reg                            fetch_en,
@@ -34,18 +35,37 @@ module Fetch #(
             .pc_addr(fetch_addr)
     );
 
+    reg rst_d1;
+    always @(posedge clk) begin
+        rst_d1 <= rst;
+    end
+
     always @(posedge clk)
     begin
-        if (!rst) begin
-            fetch_en <= 1;
-            `MSG(5, ("FETCH: addr=%h op=%h", {fetch_addr, 2'b00}, fetch_insn));
-        end else begin
+        if (rst) begin
             fetch_en <= 0;
+            stage_out_insn_valid <= 0;
+        end else if (rst_d1) begin
+            fetch_en <= ~dbg_on_rst;
+        end else begin
+            fetch_en <= fetch_en;
+            if (fetch_en) begin
+                `MSG(5, ("FETCH: addr=%h op=%h", {fetch_addr, 2'b00}, fetch_insn));
+            end
+        end
+    end
+
+    always @(posedge clk)
+    begin
+        if (rst) begin
+            stage_out_insn_valid <= 0;
+        end else begin
+            stage_out_insn_valid <= fetch_en;
         end
 
-        stage_out_insn_valid <= 1; //FIXME
-        stage_out_insn_addr <= fetch_addr;//FIXME
+        stage_out_insn_addr <= fetch_addr;
         stage_out_insn <= fetch_insn;
     end
+
 
 endmodule: Fetch

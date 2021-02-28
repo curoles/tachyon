@@ -1,4 +1,4 @@
-/* Tachyon Core.
+/* Tachyon Pipeline Stage parameters.
  *
  * Author:    Igor Lesik 2021
  * Copyright: Igor Lesik 2021

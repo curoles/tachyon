@@ -18,16 +18,21 @@ module ReadMemStage #(
     output stage::InsnBundle              stage_out_insn
 );
 
+
     always @(posedge clk)
     begin
         if (!rst) begin
-            `MSG(5, ("RDMEM: addr=%h op=%h",
-                {insn.addr, 2'b00}, insn.insn));
+            stage_out_insn.valid <= 0;
         end else begin
-            //
+            stage_out_insn.valid <= insn.valid;
+            if (insn.valid) begin
+                `MSG(5, ("RDMEM: addr=%h op=%h",
+                    {insn.addr, 2'b00}, insn.insn));
+            end
         end
 
-         stage_out_insn <= insn;
+        stage_out_insn.addr <= insn.addr;
+        stage_out_insn.insn <= insn.insn;
     end
 
 

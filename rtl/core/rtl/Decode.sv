@@ -25,14 +25,16 @@ module Decode #(
 
     always @(posedge clk)
     begin
-        if (!rst) begin
-            `MSG(5, ("DECODE: addr=%h op=%h is_branch=%d",
-                {insn_addr, 2'b00}, insn, insn_is_branch));
+        if (rst) begin
+            stage_out_insn.valid <= 0;
         end else begin
-            //
+            stage_out_insn.valid <= insn_valid;
+            if (insn_valid) begin
+                `MSG(5, ("DECODE: addr=%h op=%h is_branch=%d",
+                    {insn_addr, 2'b00}, insn, insn_is_branch));
+            end
         end
 
-        stage_out_insn.valid <= insn_valid; //FIXME
         stage_out_insn.addr <= insn_addr;
         stage_out_insn.insn <= insn;
     end

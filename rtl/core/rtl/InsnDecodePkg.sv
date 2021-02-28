@@ -1,3 +1,16 @@
+/*
+ *
+ *
+ * Table 27: Encoding of Instructions That Alter Instruction Sequence
+ *
+ * | 31:27 | 26 | 25 | 24 | 23 | 20:18 | 2:0 | Instruction | Description |
+ * | ----- | -- | -- | -- | -- | ----- | --- | ----------- | ----------- |                     
+ * | 01001 | 0  | 0  | 0  | 0  |       |     | RET, RFI    |             |
+ * | 01001 0 0 1 0 000  JSRR Jump Subroutine Indirect (Through Register) 
+ *
+ *
+ */
+
 package InsnDecodePkg;
 
     typedef logic [31:0] InsnOpcode;

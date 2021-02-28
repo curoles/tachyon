@@ -19,7 +19,7 @@ do
     echo "${cyan}${time} RUN${reset} $cmd"
     $cmd || { echo "${red}FAIL${reset} $cmd"; exit 1; }
 
-    cmd="$RTLSIM +prg-image-file-hex=$test.hex +reset-addr=0x11000 +max-cycles=10"
+    cmd="$RTLSIM +prg-image-file-hex=$test.hex +reset-addr=0x11000 +max-cycles=10 +log-level=10"
     time=$(( $(date +%s) - $start_time ))
     echo "${cyan}${time} RUN${reset} $cmd"
     $cmd || { echo "${red}FAIL${reset} $cmd"; exit 1; }

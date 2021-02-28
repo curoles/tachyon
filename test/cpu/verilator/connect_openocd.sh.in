@@ -1,18 +1,22 @@
 #!/bin/bash
 
 RTLSIM=@CMAKE_CURRENT_BINARY_DIR@/obj_dir_TachyonCPU/VTbTop
+TCP_PORT=9999
 
 red=`tput setaf 1; tput bold`
 green=`tput setaf 2`
 cyan=`tput setaf 6`
 reset=`tput sgr0`
 
-cmd="$RTLSIM +run-forever +debug-on-reset"
+cmd="$RTLSIM +run-forever +debug-on-reset +jtag_dpi_enable=1 +jtag_dpi_tcp_port=${TCP_PORT} +log-level=10"
 echo "${cyan}Simulation: ${green}$cmd${reset}"
 echo "${red}Press Ctrl-C to terminate the simulation.${reset}"
 echo ""
 
-echo "Start OpenOCD in separate terminal and press any key when it is ready."
+echo "Press any key to start the simulation; it will wait for OpenOCD to connect."
+echo "Then start OpenOCD in separate terminal."
+echo "OpenOCD bitbanging TCP/IP port:${TCP_PORT}"
+echo "Example: oocd_scripts$ openocd -f bitbang.cfg"
 echo ""
 
 read -t 120 -n 1 -p "Press any key"

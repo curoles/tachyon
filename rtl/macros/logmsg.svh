@@ -4,7 +4,7 @@
 `ifdef MSG_LEVEL
     `define MSG(level, msg_str) \
         do begin \
-            if (level < `MSG_LEVEL) begin \
+            if (level < `MSG_LEVEL && level < cfg::logmsg_level) begin \
                 $write("%0t %s\n", $time, $sformatf msg_str); \
             end \
         end while(0)

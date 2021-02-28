@@ -15,6 +15,7 @@ module TbTop #(
     input wire [ADDR_WIDTH-1:0] ctb_rst_addr
 );
     reg [ADDR_WIDTH-1:0] rst_addr;
+    reg debug_on_reset;
 
     // JTAG signals:
     wire tck, tms, tdi, tdo, trstn;
@@ -36,6 +37,7 @@ module TbTop #(
             .clk(clk),
             .rst(rst),
             .rst_addr(rst_addr[ADDR_WIDTH-1:2]),
+            .dbg_on_rst(debug_on_reset),
             .tck,
             .tms,
             .tdi,
@@ -48,6 +50,14 @@ module TbTop #(
 
     // Do all startup steps: load program image and etc.
     initial begin
+
+`ifdef MSG_LEVEL
+        // MSG macro logging level.
+        if (!$value$plusargs("log-level=%d", cfg::logmsg_level)) begin
+            cfg::logmsg_level = 0;
+        end
+        `MSG(2, ("Logging level=%0d (max level=%0d)", cfg::logmsg_level, `MSG_LEVEL));
+`endif
 
         // Load program image.
         if ($test$plusargs("prg-image-file-hex")) begin
@@ -76,6 +86,14 @@ module TbTop #(
             run_forever = 1;
         end else begin
             run_forever = 0;
+        end
+
+        // Debug-on-Reset pin.
+        if ($test$plusargs("debug-on-reset") && $test$plusargs("jtag_dpi_enable")) begin
+            debug_on_reset = 1;
+            `MSG(3, ("Debug-on-Reset enabled"));
+        end else begin
+            debug_on_reset = 0;
         end
     end
 

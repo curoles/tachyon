@@ -1,2 +1,3 @@
+ConfigPkg.sv
 -F ../../core/rtl/tachyon_core.flist
 TachyonCPU.sv

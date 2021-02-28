@@ -15,6 +15,7 @@ module TachyonCore #(
     input  wire                  clk,
     input  wire                  rst,
     input  wire [ADDR_WIDTH-1:2] rst_addr,
+    input  wire                  dbg_on_rst,
 
     // Debug APB signals
     input  wire [DBG_APB_ADDR_WIDTH-1:0]  dbg_apb_addr,
@@ -89,6 +90,7 @@ module TachyonCore #(
             .clk(clk),
             .rst(rst),
             .rst_addr(rst_addr),
+            .dbg_on_rst(dbg_on_rst),
             .fetch_en(insn_fetch_en),
             .fetch_addr(insn_fetch_addr),
             .fetch_insn(insn_fetch_data),
