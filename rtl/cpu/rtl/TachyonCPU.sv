@@ -84,13 +84,16 @@ module TachyonCPU #(
     wire                      ram_rd_en;
     wire [ADDR_WIDTH-1:2]     ram_rd_addr;
     wire [RAM_DATA_WIDTH-1:0] ram_rd_data;
+    wire                      ram_rd_valid;
+    wire [ADDR_WIDTH-1:2]     ram_rd_addr_out;
     wire                      ram_wr_en;
     wire [ADDR_WIDTH-1:2]     ram_wr_addr;
     wire [RAM_DATA_WIDTH-1:0] ram_wr_data;
 
     SimRAM#(.DATA_SIZE(RAM_DATA_SIZE), .ADDR_WIDTH(ADDR_WIDTH))
         _ram(.clk(clk),
-             .rd_en(ram_rd_en), .rd_addr(ram_rd_addr), .rd_data(ram_rd_data),
+             .rd_en(ram_rd_en), .rd_addr(ram_rd_addr),
+             .rd_valid(ram_rd_valid), .rd_data(ram_rd_data), .rd_addr_out(ram_rd_addr_out),
              .wr_en(ram_wr_en), .wr_addr(ram_wr_addr), .wr_data(ram_wr_data)
     );
 
@@ -117,7 +120,9 @@ module TachyonCPU #(
             .dbg_apb_rdata(core2dbg_apb_data_out[0]),
             .insn_fetch_en(core2mem_fetch_en),
             .insn_fetch_addr(core2mem_fetch_addr),
-            .insn_fetch_data(mem2core_fetch_data)
+            .insn_fetch_valid(ram_rd_valid),
+            .insn_fetch_data(mem2core_fetch_data),
+            .insn_fetched_addr(ram_rd_addr_out)
     );
 
     export "DPI-C" function public_get_PC;

@@ -5,9 +5,9 @@
  *
  */
 module TachyonCore #(
-    parameter   ADDR_WIDTH = 32,
-    localparam  INSN_SIZE  = 4, // Instruction word size is 32 bits
-    localparam  INSN_WIDTH = INSN_SIZE * 8,
+    parameter   ADDR_WIDTH = core::ADDR_WIDTH,
+    localparam  INSN_SIZE  = core::INSN_SIZE, // Instruction word size is 32 bits, 4 bytes
+    localparam  INSN_WIDTH = core::INSN_WIDTH,
     parameter   DBG_APB_ADDR_WIDTH  = 5,
     parameter   DBG_APB_WDATA_WIDTH = 32,
     parameter   DBG_APB_RDATA_WIDTH = 32
@@ -28,7 +28,9 @@ module TachyonCore #(
 
     output reg                   insn_fetch_en,
     output reg  [ADDR_WIDTH-1:2] insn_fetch_addr,
-    input  wire [INSN_WIDTH-1:0] insn_fetch_data
+    input  wire                  insn_fetch_valid,
+    input  wire [INSN_WIDTH-1:0] insn_fetch_data,
+    input  wire [ADDR_WIDTH-1:2] insn_fetched_addr
 );
     wire                           dbg_req;   // Debug request
     wire                           dbg_wr_rd; // Debug register write/read request
@@ -61,24 +63,33 @@ module TachyonCore #(
     );
 
     reg [31:0] dbg_reg[32];
+    reg dbg2fetch_itr_cmd;
+    reg [31:0] dbg2fetch_itr_insn;
 
     always @(posedge clk)
     begin
         if (dbg_req) begin
             if (dbg_wr_rd) begin
-                $display("%t CORE: Debug write addr=%h val=%h",
-                    $time, dbg_addr, dbg_wdata);
+                `MSG(3, ("CORE: Debug write addr=%h val=%h",
+                    dbg_addr, dbg_wdata));
+                assert(!$isunknown(dbg_addr)) else $error("%m dbg_addr=X");
+                if (dbg_addr == core::DBGI_ITR3) begin
+                    `MSG(3, ("%m ================ ITR3 =============="));
+                    dbg2fetch_itr_insn <= dbg_wdata;
+                end
                 dbg_reg[integer'(dbg_addr)] <= dbg_wdata;
                 dbg_rd_ready <= 0;
             end else begin
-                $display("%t CORE: Debug read addr[%h]=%h",
-                    $time, dbg_addr, dbg_reg[integer'(dbg_addr)]);
+                `MSG(3, ("CORE: Debug read addr[%h]=%h",
+                    dbg_addr, dbg_reg[integer'(dbg_addr)]));
                 dbg_rdata <= dbg_reg[integer'(dbg_addr)];
                 dbg_rd_ready <= 1;
             end
         end else begin
             dbg_rd_ready <= 0;
         end
+
+        dbg2fetch_itr_cmd <= dbg_req & dbg_wr_rd & (dbg_addr == core::DBGI_ITR3);
     end
 
     wire                  fetch2decode_insn_valid;
@@ -91,15 +102,21 @@ module TachyonCore #(
             .rst(rst),
             .rst_addr(rst_addr),
             .dbg_on_rst(dbg_on_rst),
+            .backend_redirect_valid(0),
+            .backend_redirect_addr(0),
             .fetch_en(insn_fetch_en),
             .fetch_addr(insn_fetch_addr),
-            .fetch_insn(insn_fetch_data),
+            .fetched_valid(insn_fetch_valid),
+            .fetched_insn(insn_fetch_data),
+            .fetched_addr(insn_fetched_addr),
             .stage_out_insn_valid(fetch2decode_insn_valid),
             .stage_out_insn_addr(fetch2decode_insn_addr),
-            .stage_out_insn(fetch2decode_insn)
+            .stage_out_insn(fetch2decode_insn),
+            .dbg_itr_valid(dbg2fetch_itr_cmd),
+            .dbg_itr_insn(dbg2fetch_itr_insn)
     );
 
-    stage::InsnBundle decode2read_insn;
+    core::InsnBundle decode2read_insn;
 
     Decode#(.ADDR_WIDTH(ADDR_WIDTH))
         _decode(
@@ -111,7 +128,7 @@ module TachyonCore #(
             .stage_out_insn(decode2read_insn)
     );
 
-    stage::InsnBundle read2mem_insn;
+    core::InsnBundle read2mem_insn;
 
     ReadStage#(.ADDR_WIDTH(ADDR_WIDTH))
         _read(
@@ -121,7 +138,7 @@ module TachyonCore #(
             .stage_out_insn(read2mem_insn)
     );
 
-    stage::InsnBundle mem2exe_insn;
+    core::InsnBundle mem2exe_insn;
 
     ReadMemStage#(.ADDR_WIDTH(ADDR_WIDTH))
         _readmem(
@@ -131,7 +148,7 @@ module TachyonCore #(
             .stage_out_insn(mem2exe_insn)
     );
 
-    stage::InsnBundle exe2wrb_insn;
+    core::InsnBundle exe2wrb_insn;
 
     Execute#(.ADDR_WIDTH(ADDR_WIDTH))
         _execute(

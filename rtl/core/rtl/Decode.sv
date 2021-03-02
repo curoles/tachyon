@@ -7,17 +7,17 @@
  *
  */
 module Decode #(
-    parameter   ADDR_WIDTH = 32,
-    localparam  ADDR_START = 2, // 4 bytes aligned
-    localparam  INSN_SIZE  = 4,
-    localparam  INSN_WIDTH = INSN_SIZE * 8
+    parameter   ADDR_WIDTH = core::ADDR_WIDTH,
+    localparam  INSN_ADDR_START = core::INSN_ADDR_START,
+    localparam  INSN_SIZE  = core::INSN_SIZE,
+    localparam  INSN_WIDTH = core::INSN_WIDTH
 )(
-    input  wire                           clk,
-    input  wire                           rst,
-    input  wire                           insn_valid,
-    input  wire [ADDR_WIDTH-1:ADDR_START] insn_addr,
-    input  wire [INSN_WIDTH-1:0]          insn,
-    output stage::InsnBundle              stage_out_insn
+    input  wire                                clk,
+    input  wire                                rst,
+    input  wire                                insn_valid,
+    input  wire [ADDR_WIDTH-1:INSN_ADDR_START] insn_addr,
+    input  wire [INSN_WIDTH-1:0]               insn,
+    output core::InsnBundle                    stage_out_insn
 );
 
     reg insn_is_branch;

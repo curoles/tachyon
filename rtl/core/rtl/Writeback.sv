@@ -7,14 +7,14 @@
  *
  */
 module Writeback #(
-    parameter   ADDR_WIDTH = stage::ADDR_WIDTH,
-    localparam  ADDR_START = stage::ADDR_START,
-    localparam  INSN_SIZE  = stage::INSN_SIZE,
-    localparam  INSN_WIDTH = stage::INSN_WIDTH
+    parameter   ADDR_WIDTH = core::ADDR_WIDTH,
+    localparam  INSN_ADDR_START = core::INSN_ADDR_START,
+    localparam  INSN_SIZE  = core::INSN_SIZE,
+    localparam  INSN_WIDTH = core::INSN_WIDTH
 )(
     input  wire                           clk,
     input  wire                           rst,
-    input  stage::InsnBundle              insn
+    input  core::InsnBundle              insn
 );
 
 
