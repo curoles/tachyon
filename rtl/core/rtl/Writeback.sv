@@ -20,7 +20,7 @@ module Writeback #(
 
     always @(posedge clk)
     begin
-        if (!rst) begin
+        if (rst) begin
             //retire.valid <= 0;
         end else begin
             //retire.valid <= insn.valid;

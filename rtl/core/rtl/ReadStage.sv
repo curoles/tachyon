@@ -22,7 +22,7 @@ module ReadStage #(
 
     always @(posedge clk)
     begin
-        if (!rst) begin
+        if (rst) begin
             stage_out_insn.valid <= 0;
         end else begin
             stage_out_insn.valid <= insn.valid;
@@ -34,6 +34,7 @@ module ReadStage #(
 
         stage_out_insn.addr <= insn.addr;
         stage_out_insn.insn <= insn.insn;
+
     end
 
 endmodule

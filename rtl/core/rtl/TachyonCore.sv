@@ -74,7 +74,6 @@ module TachyonCore #(
                     dbg_addr, dbg_wdata));
                 assert(!$isunknown(dbg_addr)) else $error("%m dbg_addr=X");
                 if (dbg_addr == core::DBGI_ITR3) begin
-                    `MSG(3, ("%m ================ ITR3 =============="));
                     dbg2fetch_itr_insn <= dbg_wdata;
                 end
                 dbg_reg[integer'(dbg_addr)] <= dbg_wdata;
