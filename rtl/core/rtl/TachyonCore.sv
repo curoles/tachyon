@@ -106,20 +106,25 @@ module TachyonCore #(
         .wr_val(rf_wr_val)
     );
 
-    initial begin
+    /*initial begin
         rf_wr_en = 1;
-        rf_wr_addr = 7;
+        rf_wr_addr = 6;
         rf_wr_val = 123;
-        rf_rd_addr[0] = 7;
+        rf_rd_addr[0] = 5;
     end
 
     always @(posedge clk) begin
         `MSG(0,("++++++++ read rf[%0d]=%h",rf_rd_addr[0],rf_rd_val[0]));
         rf_wr_val <= integer'(rf_wr_val) + 1;
         rf_wr_en <= 1;
+        //rf_wr_addr <= integer'(rf_wr_addr) + 1;
+        //rf_rd_addr[0] <= integer'(rf_rd_addr[0]) + 1;
+    end
+
+    always @(posedge clk) begin
         rf_wr_addr <= integer'(rf_wr_addr) + 1;
         rf_rd_addr[0] <= integer'(rf_rd_addr[0]) + 1;
-    end
+    end*/
 
     wire                  fetch2decode_insn_valid;
     wire [ADDR_WIDTH-1:2] fetch2decode_insn_addr;
