@@ -11,6 +11,11 @@ parameter INSN_SIZE  = 4;
 parameter INSN_WIDTH = INSN_SIZE * 8;
 parameter INSN_ADDR_START = $clog2(INSN_SIZE);
 
+parameter REG_WIDTH = 64;
+
+parameter RF_SIZE = 32;
+parameter RF_ADDR_WIDTH = $clog2(RF_SIZE);
+
 typedef struct packed {
     logic valid;
     logic [ADDR_WIDTH-1:INSN_ADDR_START] addr;

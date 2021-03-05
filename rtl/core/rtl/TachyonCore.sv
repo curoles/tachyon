@@ -91,6 +91,36 @@ module TachyonCore #(
         dbg2fetch_itr_cmd <= dbg_req & dbg_wr_rd & (dbg_addr == core::DBGI_ITR3);
     end
 
+    reg [core::RF_ADDR_WIDTH-1:0] rf_rd_addr[3];
+    wire [core::REG_WIDTH-1:0] rf_rd_val[3];
+    reg rf_wr_en;
+    reg [core::RF_ADDR_WIDTH-1:0] rf_wr_addr;
+    reg [core::REG_WIDTH-1:0] rf_wr_val;
+
+    TachyonRegFile _rf(
+        .clk(clk),
+        .rd_addr(rf_rd_addr),
+        .rd_val(rf_rd_val),
+        .wr_enable(rf_wr_en),
+        .wr_addr(rf_wr_addr),
+        .wr_val(rf_wr_val)
+    );
+
+    initial begin
+        rf_wr_en = 1;
+        rf_wr_addr = 7;
+        rf_wr_val = 123;
+        rf_rd_addr[0] = 7;
+    end
+
+    always @(posedge clk) begin
+        `MSG(0,("++++++++ read rf[%0d]=%h",rf_rd_addr[0],rf_rd_val[0]));
+        rf_wr_val <= integer'(rf_wr_val) + 1;
+        rf_wr_en <= 1;
+        rf_wr_addr <= integer'(rf_wr_addr) + 1;
+        rf_rd_addr[0] <= integer'(rf_rd_addr[0]) + 1;
+    end
+
     wire                  fetch2decode_insn_valid;
     wire [ADDR_WIDTH-1:2] fetch2decode_insn_addr;
     wire [INSN_WIDTH-1:0] fetch2decode_insn;

@@ -37,4 +37,23 @@ module ReadStage #(
 
     end
 
+    InsnDecodePkg::SysRegId sysreg_id;
+    InsnDecodePkg::SysRegId reg_ra, reg_rb, reg_rc, reg_rd;
+    always_comb begin : extractOperands
+        reg_rd = InsnDecodePkg::insn_operand_rd(insn.insn);
+        sysreg_id = InsnDecodePkg::insn_operand_sysreg(insn.insn);
+    end
+
+    always @(posedge clk)
+    begin
+        if (~rst & insn.valid) begin
+            if (InsnDecodePkg::insn_is_MFS(insn.insn)) begin
+                `MSG(5, ("READ: MFS instruction, dest reg_id:%d, sysreg_id:%h",
+                    /*InsnDecodePkg::insn_operand_rd(insn.insn)*/reg_rd, sysreg_id));
+            end
+        end
+
+
+    end
+
 endmodule

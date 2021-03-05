@@ -11,6 +11,8 @@ set(TB_CPP_FILES
 
 set(TEST_NAME TachyonCPU)
 set(TB_FLIST
+    -F ${DARKCIRCUIT_SOURCE_DIR}/rtl/lib/gates/generic/generic.flist
+    -F ${DARKCIRCUIT_SOURCE_DIR}/rtl/lib/parts/parts.flist
     -F ${DARKCIRCUIT_SOURCE_DIR}/rtl/blocks/blocks.flist
     -F ${TACHYON_SOURCE_DIR}/rtl/cpu/rtl/tachyon_cpu.flist
     -y ${DARKCIRCUIT_SOURCE_DIR}/rtl/lib/macros

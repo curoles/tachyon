@@ -35,4 +35,16 @@ module Execute #(
         stage_out_insn.insn <= insn.insn;
     end
 
+    always @(posedge clk)
+    begin
+        if (~rst & insn.valid) begin
+            if (InsnDecodePkg::insn_is_MFS(insn.insn)) begin
+                `MSG(5, ("EXE: MFS instruction, dest reg_id:%d",
+                    InsnDecodePkg::insn_operand_rd(insn.insn)));
+            end
+        end
+
+
+    end
+
 endmodule

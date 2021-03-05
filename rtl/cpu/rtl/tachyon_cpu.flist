@@ -1,3 +1,4 @@
 ConfigPkg.sv
+-F ../../blocks/blocks.flist
 -F ../../core/rtl/tachyon_core.flist
 TachyonCPU.sv
