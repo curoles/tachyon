@@ -18,9 +18,9 @@ package InsnDecodePkg;
     typedef logic [4:0] RegId;
 
     typedef struct packed {
-        logic [12:8] group;
-        logic [14:13] pl;
-        logic [17:15] num;
+        logic [9:7] num;
+        logic [6:5] pl;
+        logic [4:0] group;
     } SysRegFields;
 
     typedef union packed {

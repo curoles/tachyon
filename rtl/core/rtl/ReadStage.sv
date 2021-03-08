@@ -15,7 +15,12 @@ module ReadStage #(
     input  wire                          clk,
     input  wire                          rst,
     input  core::InsnBundle              insn,
-    output core::InsnBundle              stage_out_insn
+    output core::InsnBundle              stage_out_insn,
+    // Read Sysreg
+    output reg                           sreg_rd_en,
+    output reg  [4:0]                    sreg_rd_group,
+    output reg  [2:0]                    sreg_rd_regnum,
+    output reg  [1:0]                    sreg_rd_plevel
 );
 
 
@@ -48,12 +53,19 @@ module ReadStage #(
     begin
         if (~rst & insn.valid) begin
             if (InsnDecodePkg::insn_is_MFS(insn.insn)) begin
-                `MSG(5, ("READ: MFS instruction, dest reg_id:%d, sysreg_id:%h",
-                    /*InsnDecodePkg::insn_operand_rd(insn.insn)*/reg_rd, sysreg_id));
+                `MSG(5, ("READ: MFS instruction, dest reg_id:%d, sysreg_id:%h, group:%0d, num:%0d, pl:%0d",
+                    /*InsnDecodePkg::insn_operand_rd(insn.insn)*/reg_rd, sysreg_id,
+                    sysreg_id.fields.group, sysreg_id.fields.num, sysreg_id.fields.pl));
+                sreg_rd_en <= 1;
+                sreg_rd_group  <= sysreg_id.fields.group;
+                sreg_rd_regnum <= sysreg_id.fields.num;
+                sreg_rd_plevel <= sysreg_id.fields.pl;
+            end else begin
+                sreg_rd_en <= 0;
             end
+        end else begin
+            sreg_rd_en <= 0;
         end
-
-
     end
 
 endmodule

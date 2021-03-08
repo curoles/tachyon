@@ -1,5 +1,6 @@
 InsnDecodePkg.sv
 CorePkg.sv
+SysRegsStar.sv
 Writeback.sv
 Execute.sv
 ReadMemStage.sv

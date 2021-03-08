@@ -126,6 +126,31 @@ module TachyonCore #(
         rf_rd_addr[0] <= integer'(rf_rd_addr[0]) + 1;
     end*/
 
+    wire sreg_rd_en, sreg_wr_en;
+    wire [4:0] sreg_rd_group, sreg_wr_group;
+    wire [2:0] sreg_rd_regnum, sreg_wr_regnum;
+    wire [1:0] sreg_rd_plevel, sreg_wr_plevel;
+    wire sreg_rd_valid;
+    wire [64-1:0] sreg_rd_val, sreg_wr_reg;
+
+    SysRegsStar _sregbus(
+        .clk,
+        .rst,
+        // Read
+        .rd_en(sreg_rd_en),
+        .rd_group(sreg_rd_group),
+        .rd_regnum(sreg_rd_regnum),
+        .rd_plevel(sreg_rd_plevel),
+        .rd_valid(sreg_rd_valid),
+        .rd_val(sreg_rd_val),
+        // Write
+        .wr_en(sreg_wr_en),
+        .wr_group(sreg_wr_group),
+        .wr_regnum(sreg_wr_regnum),
+        .wr_plevel(sreg_wr_plevel),
+        .wr_val(sreg_wr_val)
+    );
+
     wire                  fetch2decode_insn_valid;
     wire [ADDR_WIDTH-1:2] fetch2decode_insn_addr;
     wire [INSN_WIDTH-1:0] fetch2decode_insn;
@@ -169,7 +194,11 @@ module TachyonCore #(
             .clk(clk),
             .rst(rst),
             .insn(decode2read_insn),
-            .stage_out_insn(read2mem_insn)
+            .stage_out_insn(read2mem_insn),
+            .sreg_rd_en(sreg_rd_en),
+            .sreg_rd_group(sreg_rd_group),
+            .sreg_rd_regnum(sreg_rd_regnum),
+            .sreg_rd_plevel(sreg_rd_plevel)
     );
 
     core::InsnBundle mem2exe_insn;
