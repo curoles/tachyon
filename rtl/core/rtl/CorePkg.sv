@@ -41,6 +41,6 @@ typedef enum logic [3:0] {
     DBGI_DTR_HI, DBGI_DTR_LO
 } DbgIfaceReg;
 
-
+parameter NR_SYSREG_NODES = 11;
 
 endpackage

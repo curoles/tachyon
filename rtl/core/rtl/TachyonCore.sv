@@ -5,9 +5,11 @@
  *
  */
 module TachyonCore #(
-    parameter   ADDR_WIDTH = core::ADDR_WIDTH,
-    localparam  INSN_SIZE  = core::INSN_SIZE, // Instruction word size is 32 bits, 4 bytes
-    localparam  INSN_WIDTH = core::INSN_WIDTH,
+    parameter   ADDR_WIDTH      = core::ADDR_WIDTH,
+    localparam  INSN_SIZE       = core::INSN_SIZE, // Instruction word size is 32 bits, 4 bytes
+    localparam  INSN_WIDTH      = core::INSN_WIDTH,
+    localparam  REG_WIDTH       = core::REG_WIDTH,
+    localparam  RF_ADDR_WIDTH   = core::RF_ADDR_WIDTH,
     parameter   DBG_APB_ADDR_WIDTH  = 5,
     parameter   DBG_APB_WDATA_WIDTH = 32,
     parameter   DBG_APB_RDATA_WIDTH = 32
@@ -93,9 +95,9 @@ module TachyonCore #(
 
     reg [core::RF_ADDR_WIDTH-1:0] rf_rd_addr[3];
     wire [core::REG_WIDTH-1:0] rf_rd_val[3];
-    reg rf_wr_en;
-    reg [core::RF_ADDR_WIDTH-1:0] rf_wr_addr;
-    reg [core::REG_WIDTH-1:0] rf_wr_val;
+    wire rf_wr_en;
+    wire [core::RF_ADDR_WIDTH-1:0] rf_wr_addr;
+    wire [core::REG_WIDTH-1:0] rf_wr_val;
 
     TachyonRegFile _rf(
         .clk(clk),
@@ -126,12 +128,52 @@ module TachyonCore #(
         rf_rd_addr[0] <= integer'(rf_rd_addr[0]) + 1;
     end*/
 
+    wire       sreg_node10_rd_en;
+    wire [2:0] sreg_node10_rd_regnum;
+    wire [1:0] sreg_node10_rd_plevel;
+    reg        sreg_node10_rd_valid;
+    reg  [core::REG_WIDTH-1:0]  sreg_node10_rd_val;
+
+    always @(posedge clk)
+    begin
+        if (rst) begin
+            sreg_node10_rd_valid <= 0;
+        end else begin
+            //if (sreg_node10_wr_en) begin
+                //
+            //end
+
+            if (sreg_node10_rd_en) begin
+                //$display("%t SREG: read num:%0d pl:%0d", $time, sreg_node10_rd_regnum, sreg_node10_rd_plevel);
+                if (sreg_node10_rd_regnum == 7 && sreg_node10_rd_plevel == 0) begin
+                    `MSG(3, ("SREG: read EDBGDTR hi:%0h lo:%0h", dbg_reg[core::DBGI_DTR_HI], dbg_reg[core::DBGI_DTR_LO]));
+                    sreg_node10_rd_valid <= 1;
+                    sreg_node10_rd_val <= {dbg_reg[core::DBGI_DTR_HI], dbg_reg[core::DBGI_DTR_LO]};
+                end
+            end else begin
+                sreg_node10_rd_valid <= 0;
+            end
+        end
+    end
+
     wire sreg_rd_en, sreg_wr_en;
     wire [4:0] sreg_rd_group, sreg_wr_group;
     wire [2:0] sreg_rd_regnum, sreg_wr_regnum;
     wire [1:0] sreg_rd_plevel, sreg_wr_plevel;
     wire sreg_rd_valid;
     wire [64-1:0] sreg_rd_val, sreg_wr_reg;
+
+    wire [core::NR_SYSREG_NODES-1:0] sreg_node_rd_en;
+    wire [2:0]                       sreg_node_rd_regnum[core::NR_SYSREG_NODES];
+    wire [1:0]                       sreg_node_rd_plevel[core::NR_SYSREG_NODES];
+    wire [core::NR_SYSREG_NODES-1:0] sreg_node_rd_valid;
+    wire [core::REG_WIDTH-1:0]       sreg_node_rd_val[core::NR_SYSREG_NODES];
+
+    assign sreg_node10_rd_en = sreg_node_rd_en[10];
+    assign sreg_node10_rd_regnum = sreg_node_rd_regnum[10];
+    assign sreg_node10_rd_plevel = sreg_node_rd_plevel[10];
+    assign sreg_node_rd_valid[10] = sreg_node10_rd_valid;
+    assign sreg_node_rd_val[10] = sreg_node10_rd_val;
 
     SysRegsStar _sregbus(
         .clk,
@@ -148,7 +190,13 @@ module TachyonCore #(
         .wr_group(sreg_wr_group),
         .wr_regnum(sreg_wr_regnum),
         .wr_plevel(sreg_wr_plevel),
-        .wr_val(sreg_wr_val)
+        .wr_val(sreg_wr_val),
+        // Nodes
+        .node_rd_en(sreg_node_rd_en),
+        .node_rd_regnum(sreg_node_rd_regnum),
+        .node_rd_plevel(sreg_node_rd_plevel),
+        .node_rd_valid(sreg_node_rd_valid),
+        .node_rd_val(sreg_node_rd_val)
     );
 
     wire                  fetch2decode_insn_valid;
@@ -212,20 +260,34 @@ module TachyonCore #(
     );
 
     core::InsnBundle exe2wrb_insn;
+    wire exe2wrb_rf_wr_en;
+    wire [RF_ADDR_WIDTH-1:0] exe2wrb_rf_wr_addr;
+    wire [REG_WIDTH-1:0] exe2wrb_rf_wr_val;
 
     Execute#(.ADDR_WIDTH(ADDR_WIDTH))
         _execute(
             .clk(clk),
             .rst(rst),
             .insn(mem2exe_insn),
-            .stage_out_insn(exe2wrb_insn)
+            .stage_out_insn(exe2wrb_insn),
+            .sreg_rd_valid(sreg_rd_valid),
+            .sreg_rd_val(sreg_rd_val),
+            .rf_wr_en(exe2wrb_rf_wr_en),
+            .rf_wr_addr(exe2wrb_rf_wr_addr),
+            .rf_wr_val(exe2wrb_rf_wr_val)
     );
 
     Writeback#(.ADDR_WIDTH(ADDR_WIDTH))
         _writeback(
             .clk(clk),
             .rst(rst),
-            .insn(exe2wrb_insn)
+            .insn(exe2wrb_insn),
+            .exe_rf_wr_en(exe2wrb_rf_wr_en),
+            .exe_rf_wr_addr(exe2wrb_rf_wr_addr),
+            .exe_rf_wr_val(exe2wrb_rf_wr_val),
+            .rf_wr_en,
+            .rf_wr_addr,
+            .rf_wr_val
     );
 
 endmodule: TachyonCore
