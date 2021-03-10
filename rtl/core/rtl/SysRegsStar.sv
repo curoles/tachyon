@@ -26,7 +26,11 @@ module SysRegsStar #(
     output wire [2:0]            node_rd_regnum[NR_NODES],
     output wire [1:0]            node_rd_plevel[NR_NODES],
     input  wire [NR_NODES-1:0]   node_rd_valid,
-    input  wire [REG_WIDTH-1:0]  node_rd_val[NR_NODES]
+    input  wire [REG_WIDTH-1:0]  node_rd_val[NR_NODES],
+    output wire [NR_NODES-1:0]   node_wr_en,
+    output wire [2:0]            node_wr_regnum[NR_NODES],
+    output wire [1:0]            node_wr_plevel[NR_NODES],
+    output wire [REG_WIDTH-1:0]  node_wr_val[NR_NODES]
 );
 
 
@@ -57,6 +61,26 @@ module SysRegsStar #(
                 11'b10000000000: rd_val = node_rd_val[10];
                 default: rd_val = 0;
             endcase
+        end
+    end
+
+    always_comb
+    begin
+        if (wr_en) begin
+            $display("%0t SREG write %0d:%0d:%0d val:%0h", $time, wr_group, wr_regnum, wr_plevel, wr_val);
+            case (wr_group)
+                10: begin
+                    node_wr_en = 11'b10000000000;
+                    node_wr_regnum[10] = wr_regnum;
+                    node_wr_plevel[10] = wr_plevel;
+                    node_wr_val[10]    = wr_val;
+                end
+                default: begin
+                    node_wr_en = '0;
+                end
+            endcase
+        end else begin
+            node_wr_en = '0;
         end
     end
 

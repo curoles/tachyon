@@ -28,12 +28,20 @@ package InsnDecodePkg;
         SysRegFields fields;
     } SysRegId;
 
-    function SysRegId insn_operand_sysreg(input InsnOpcode op);
-        insn_operand_sysreg = op[17:8];
+    function SysRegId insn_operand_sysreg_mfs(input InsnOpcode op);
+        insn_operand_sysreg_mfs = op[17:8];
+    endfunction
+
+    function SysRegId insn_operand_sysreg_mts(input InsnOpcode op);
+        insn_operand_sysreg_mts = {op[22:20], op[19:18], op[12:8]};
     endfunction
 
     function logic [4:0] insn_operand_rd(input InsnOpcode op);
         insn_operand_rd = op[22:18];
+    endfunction
+
+    function logic [4:0] insn_operand_ra(input InsnOpcode op);
+        insn_operand_ra = op[17:13];
     endfunction
 
     function logic insn_is_NOP(input InsnOpcode op);

@@ -12,7 +12,8 @@ module Execute #(
     localparam  INSN_SIZE       = core::INSN_SIZE,
     localparam  INSN_WIDTH      = core::INSN_WIDTH,
     localparam  REG_WIDTH       = core::REG_WIDTH,
-    localparam  RF_ADDR_WIDTH   = core::RF_ADDR_WIDTH
+    localparam  RF_ADDR_WIDTH   = core::RF_ADDR_WIDTH,
+    localparam  RF_NR_RD_PORTS  = core::RF_NR_RD_PORTS
 )(
     input  wire                          clk,
     input  wire                          rst,
@@ -22,7 +23,14 @@ module Execute #(
     input  wire [REG_WIDTH-1:0]          sreg_rd_val,
     output reg                           rf_wr_en,
     output reg  [RF_ADDR_WIDTH-1:0]      rf_wr_addr,
-    output reg  [REG_WIDTH-1:0]          rf_wr_val
+    output reg  [REG_WIDTH-1:0]          rf_wr_val,
+    input  wire [REG_WIDTH-1:0]          rf_rd_val[RF_NR_RD_PORTS],
+    // Write to SREG
+    output reg                           sreg_wr_en,
+    output reg [4:0]                     sreg_wr_group,
+    output reg [2:0]                     sreg_wr_regnum,
+    output reg [1:0]                     sreg_wr_plevel,
+    output reg [REG_WIDTH-1:0]           sreg_wr_val
 );
 
 
@@ -50,13 +58,24 @@ module Execute #(
                     InsnDecodePkg::insn_operand_rd(insn.insn), sreg_rd_val));
                 assert(sreg_rd_valid) else $error("SREG read not valid");
                 rf_wr_en <= 1;
+                sreg_wr_en <= 0;
                 rf_wr_addr <= InsnDecodePkg::insn_operand_rd(insn.insn);
                 rf_wr_val <= sreg_rd_val;
+            end else if (InsnDecodePkg::insn_is_MTS(insn.insn)) begin
+                `MSG(5, ("EXE: MTS instruction, val:%0h", rf_rd_val[0]));
+                rf_wr_en <= 0;
+                sreg_wr_en     <= 1;
+                sreg_wr_group  <= 10;//exe_sreg_wr_group;
+                sreg_wr_regnum <= 7;//exe_sreg_wr_regnum;
+                sreg_wr_plevel <= 0;//exe_sreg_wr_plevel;
+                sreg_wr_val    <= integer'(sreg_rd_val) + 1;//FIXME
             end else begin
                 rf_wr_en <= 0;
+                sreg_wr_en <= 0;
             end
         end else begin
             rf_wr_en <= 0;
+            sreg_wr_en <= 0;
         end
 
 

@@ -15,6 +15,7 @@ parameter REG_WIDTH = 64;
 
 parameter RF_SIZE = 32;
 parameter RF_ADDR_WIDTH = $clog2(RF_SIZE);
+parameter RF_NR_RD_PORTS = 3;
 
 typedef struct packed {
     logic valid;
